@@ -1,0 +1,37 @@
+import json
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
+
+def lambda_handler(event, context):
+    client = boto3.client('sqs')
+    
+    dynamodb = boto3.resource('dynamodb')
+    cdynamodb = boto3.client('dynamodb')
+    
+    sqsResource = boto3.resource('sqs')
+    table = dynamodb.Table('records')
+    response=table.scan()
+    
+    data=response['Items']
+    beta=[]
+    # print(data)
+    for i in data:
+        #  print(i['date_time_epochtime'])
+         beta.append(i['date_time_epochtime'])
+   
+    # print(data['date_time_epochtime'])
+    send_Data=beta[0:4]
+    
+    
+    
+    
+        
+    QueueUrl = client.get_queue_url(
+    QueueName='sqs_queue',
+    QueueOwnerAWSAccountId='335516814222'
+    )
+    
+    
+    # values=[]
+    for i in send_Data:
+        response = client.send_message(QueueUrl=QueueUrl['QueueUrl'],MessageBody=i)
