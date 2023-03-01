@@ -1,0 +1,27 @@
+import json
+import boto3
+from boto3.dynamodb.conditions import Key, Attr
+from datetime import datetime
+
+def lambda_handler(event, context):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('records')
+    print(event)
+
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    list=[]
+    for i in event['Records']:
+        print(i['body'])
+        list.append(i['body'])
+        date,time,epoch_time =i['body'].split("_")
+        print(date,time,epoch_time)
+        
+        response=table.put_item(
+        Item={
+        'date_time_epochtime': i['body'],
+        'date': date,
+        'time': time,
+        'epoch_time': epoch_time,
+        'last_updated':current_time
+        })
